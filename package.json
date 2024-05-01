@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@vicons/ionicons5": "^0.12.0",
+    "axios": "^1.6.8",
     "unocss": "^0.59.4",
     "vue": "^3.4.25",
+    "vue-router": "^4.3.2",
     "vue3-mini-weather": "^0.1.2"
   },
   "devDependencies": {
