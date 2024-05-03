@@ -20,7 +20,7 @@
       </div>
       <div class="mr-10px">
         <n-dropdown trigger="hover" :options="menuOptions" @select="handleSelect">
-          <n-avatar round size="medium" :style="{ backgroundColor: randomColor, display: 'flex', }">
+          <n-avatar round size="medium" :style="{  display: 'flex', }">
             <n-icon size="20">
               <Person />
             </n-icon>

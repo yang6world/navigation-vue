@@ -1,5 +1,5 @@
 <template>
-  <n-config-provider :locale="zhCN" :theme="darkTheme" >
+  <n-config-provider :locale="zhCN">
     <n-global-style />
     <n-message-provider>
       <n-dialog-provider>

@@ -1,252 +1,40 @@
 <script setup>
-import {h, nextTick, onMounted, onUnmounted, ref} from "vue";
-import {NIcon, NLayout, NLayoutSider, NMenu, NTooltip} from "naive-ui";
+import {computed, h, nextTick, onMounted, onUnmounted, ref} from "vue";
+import {NIcon, NLayout, NLayoutSider, NMenu, NTooltip, useMessage} from "naive-ui";
 import headers from "@/views/components/headers.vue";
 import yserver from "@/views/components/icon/yserver.vue"
 import yserverLong from "@/views/components/icon/yserverLong.vue"
 import axios from "axios";
-
+const message = useMessage();
 
 
 const loading = ref(true)
 setTimeout(function () {
   loading.value = false
 }, 1000);
-const websites = ref([
-  {
-    title: "常用推荐",
-    icon: "iconfont icon-shoucang icon-fw icon-lg ",
-    websites: [
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      }, {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      }, {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      }, {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      }, {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      }, {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-    ]
-  },
-  {
-    title: "组织应用",
-    icon: "iconfont icon-shoucang icon-fw icon-lg ",
-    websites: [
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      }, {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-      {
-        title: "GitHub",
-        description: "全球最大同性交友网站",
-        url: "https://github.com/",
-        icon: "/ico/github.png"
-      },
-    ]
-  }
-]);
-
-const getWebsites = async () => {
-  loading.value = true;
+const websites = ref([]);
+const getWebsite = async () => {
   try {
-    websites.value = await axios.get('/api/websites');
+    const response = await axios.get('/api/nav');
+    websites.value = response.data.result;
   } catch (error) {
-    console.error(error);
-  } finally {
-    loading.value = false;
+    message.error('获取数据失败');
   }
-};
+}
 
 const collapsed = ref(true)
 const handleCollapsedUpdate = (newCollapsed) => {
   collapsed.value = newCollapsed;
 }
-const menuOptions = ref(websites.value.map((website) => {
-  return {
-    label: website.title,
-    icon: () => h('i', {class: website.icon}),
-    key: website.title,
-  }
-}))
+const menuOptions = computed(() => {
+  return websites.value.map((website) => {
+    return {
+      label: website.title,
+      icon: () => h('i', { class: website.icon }),
+      key: website.title,
+    }
+  });
+});
 const sectionRefs = ref({});
 const topRef = ref(null);
 const setRef = (title) => {
@@ -280,6 +68,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', updateMobileStatus);
 });
+getWebsite()
 </script>
 
 <template>
@@ -328,7 +117,7 @@ onUnmounted(() => {
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-                  <div v-for="item in website.websites" :key="item.title"
+                  <div v-for="item in website.websites" :key="item.name"
                        class="card transform transition-transform hover:scale-105 hover:shadow-2xl description">
                     <n-tooltip placement="bottom" trigger="hover">
                       <template #trigger>
@@ -337,11 +126,11 @@ onUnmounted(() => {
                              target="_blank">
                             <div class="flex items-center space-x-2">
                               <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center">
-                                <img :src="item.icon" alt="GitHub" class="w-full h-full">
+                                <img :src="item.icon" alt="icon" class="w-full h-full" style="border-radius: 50px">
                               </div>
                               <div class="flex-grow description">
                                 <div class="text-sm font-bold truncate">
-                                  {{ item.title }}
+                                  {{ item.name }}
                                 </div>
                                 <p class="m-0 text-xs text-gray-600 truncate description">{{ item.description }}</p>
                               </div>

@@ -84,6 +84,9 @@
     position: relative
 }
 
+.s-search{
+    margin: 0px 50px 0px 20px;
+}
 
 #search-text {
     border-radius: 50px;
@@ -96,16 +99,7 @@
     width: 100%;
     height: 30px;
 }
-.header-big .search-type input:checked+label:before {
-    content: '';
-    border-width: 8px 8px 0px 8px;
-    border-style: solid;
-    border-color: rgba(0,0,0,0.6) transparent transparent;
-    position: absolute;
-    left: 50%;
-    top: 0;
-    margin-left: -8px;
-}
+
 #search button {
     position: absolute;
     top: 0;
