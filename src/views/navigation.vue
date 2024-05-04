@@ -30,7 +30,7 @@ const menuOptions = computed(() => {
   return websites.value.map((website) => {
     return {
       label: website.title,
-      icon: () => h('i', { class: website.icon }),
+      icon: () => h('i', { class: website.icon, style: 'font-size: 20px' }),
       key: website.title,
     }
   });
@@ -46,7 +46,6 @@ const setRef = (title) => {
 const onMenuSelect = (value) => {
   nextTick(() => {
     const section = sectionRefs.value[value];
-    console.log(section);
     if (section) {
       section.scrollIntoView({behavior: 'smooth'});
     }

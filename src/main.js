@@ -1,6 +1,6 @@
 import './assets/main.css'
 import 'uno.css'
-import './assets/iconfont.css';
+import '../../domain-manage/src/assets/iconfont.css';
 
 import { createApp } from 'vue'
 import App from './App.vue'

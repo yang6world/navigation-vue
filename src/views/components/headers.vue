@@ -68,14 +68,14 @@
 import { vMiniWeather, vMiniWeatherIcon } from 'vue3-mini-weather'
 import {computed, defineProps, h, ref} from 'vue'
 import axios from "axios";
-import {NAvatar, NDropdown, NIcon, NText} from "naive-ui";
+import {NAvatar, NDropdown, NIcon, NText, useMessage} from "naive-ui";
 import {
   LogOutOutline as LogoutIcon,
   Person,
   PersonCircleOutline as UserIcon,
   SettingsOutline as AdminIcon
 } from "@vicons/ionicons5";
-
+const message = useMessage();
 const props = defineProps({
   collapsed: { type: Boolean, required: true }
 })
@@ -144,7 +144,7 @@ const menuOptions = computed(() => {
     },
     {
       label: '用户信息',
-      key: 'user/record',
+      key: 'user/info',
       icon: renderIcon(UserIcon)
     },
     {
@@ -165,7 +165,7 @@ const handleSelect =(key)=>{
     Logout()
   }
   else {
-    location.href = systemInfo.value.BASE_URL+'/'+key
+    location.href = systemInfo.value.base_url+'/'+key
   }
 
 
