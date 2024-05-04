@@ -65,7 +65,8 @@
 
 </template>
 <script setup>
-import { vMiniWeather, vMiniWeatherIcon } from 'vue3-mini-weather'
+import vMiniWeather from '@/views/components/vMiniWeather.vue'
+import vMiniWeatherIcon from '@/views/components/vMiniWeatherIcon/vMiniWeatherIcon.vue'
 import {computed, defineProps, h, ref} from 'vue'
 import axios from "axios";
 import {NAvatar, NDropdown, NIcon, NText, useMessage} from "naive-ui";
