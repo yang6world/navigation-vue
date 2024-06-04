@@ -52,7 +52,7 @@
           </form>
         </div>
       </div>
-      <div class="subcategories">
+      <div class="subcategories" style="display: block">
         <!-- 小类按钮 -->
         <button v-for="(subcategory, index) in subcategories[currentCategoryIndex]" :key="index"
                 class="c-button" @click="changeSubcategory(index)">{{ subcategory.name }}
@@ -418,6 +418,8 @@ getUserInfo()
 
 .categories, .subcategories {
   text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .active:before {
