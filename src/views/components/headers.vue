@@ -3,26 +3,31 @@
   <div class="relative mb-4 diagonal-gradient">
     <div class="flex justify-between  pt-5 pl-5">
       <div class="flex">
-      <div @click="openMenu">
-        <svg t="1714319497904" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5219" width="35" height="40"><path d="M212 338c-24.852 0-45-20.148-45-45S187.148 248 212 248h600c24.852 0 45 20.148 45 45S836.852 338 812 338H212z m0 220c-24.852 0-45-20.148-45-45S187.148 468 212 468h600c24.852 0 45 20.148 45 45S836.852 558 812 558H212z m0 220c-24.852 0-45-20.148-45-45S187.148 688 212 688h600c24.852 0 45 20.148 45 45S836.852 778 812 778H212z" fill="#ffffff" p-id="5220"></path></svg>
-      </div>
+        <div @click="openMenu">
+          <svg class="icon" height="40" p-id="5219" t="1714319497904" version="1.1"
+               viewBox="0 0 1024 1024" width="35" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M212 338c-24.852 0-45-20.148-45-45S187.148 248 212 248h600c24.852 0 45 20.148 45 45S836.852 338 812 338H212z m0 220c-24.852 0-45-20.148-45-45S187.148 468 212 468h600c24.852 0 45 20.148 45 45S836.852 558 812 558H212z m0 220c-24.852 0-45-20.148-45-45S187.148 688 212 688h600c24.852 0 45 20.148 45 45S836.852 778 812 778H212z"
+                fill="#ffffff" p-id="5220"></path>
+          </svg>
+        </div>
 
-      <v-mini-weather class="w-64 pl-20px pt-10px ">
-        <template #default="{weather, icon}">
-          <div class="flex text-amber-500 text-base" >
-            <span class="mr-5px">{{weather.cityname}}</span>
-            <v-mini-weather-icon  :icon="icon" class="h-24px w-24px mr-5px"></v-mini-weather-icon>
-            <span class="mr-5px">{{weather.weather}}</span>
-            <span >{{weather.temp}}℃</span>
-          </div>
-        </template>
-      </v-mini-weather>
+        <v-mini-weather class="w-64 pl-20px pt-10px ">
+          <template #default="{weather, icon}">
+            <div class="flex text-amber-500 text-base">
+              <span class="mr-5px">{{ weather.cityname }}</span>
+              <v-mini-weather-icon :icon="icon" class="h-24px w-24px mr-5px"></v-mini-weather-icon>
+              <span class="mr-5px">{{ weather.weather }}</span>
+              <span>{{ weather.temp }}℃</span>
+            </div>
+          </template>
+        </v-mini-weather>
       </div>
       <div class="mr-10px">
-        <n-dropdown trigger="hover" :options="menuOptions" @select="handleSelect">
-          <n-avatar round size="medium" :style="{  display: 'flex', }">
+        <n-dropdown :options="menuOptions" trigger="hover" @select="handleSelect">
+          <n-avatar :style="{  display: 'flex', }" round size="medium">
             <n-icon size="20">
-              <Person />
+              <Person/>
             </n-icon>
           </n-avatar>
 
@@ -30,44 +35,35 @@
       </div>
     </div>
     <div class="s-search">
+      <div class="categories">
+        <!-- 大类按钮 -->
+        <button v-for="(category, index) in categories" class="m-button" :key="index" @click="changeCategory(index)">{{
+            category
+          }}
+        </button>
+      </div>
       <div id="search" class="s-search mx-auto mt-30px">
-        <!--<div id="search-list-menu" class="hide-type-list">
-          <div class="s-type text-center">
-            <div class="s-type-list big">
-              <div class="anchor" style="position: absolute; left: 87.5px; opacity: 1; width: 35px;"></div>
-              <label class="test" >
-                <span  v-for="item in searchBar" :key="item.type" class="s-type-item labels">{{item.type}}</span>
-              </label>
-            </div>
-          </div>
-        </div>-->
-        <form action="https://www.bing.com/search?q=" method="get" target="_blank" >
-          <input type="text" id="search-text" class="" placeholder="必应搜索" style="outline:0" >
-          <button @click="search" ><i class="iconfont icon-search"></i></button>
-        </form>
-        <!--<div id="search-list" class="hide-type-list">
-          <div >
-            <li v-for="group in searchBar" :key="group.type">
-              <ul>
-
-                <li v-for="item in group.list" :key="item.name">
-                  <label>
-                    <span class="text-muted">{{ item.name }}</span>
-                  </label>
-                </li>
-              </ul>
-            </li>
-          </div>
-        </div>-->
+        <div class="search-box">
+          <form :action="currentAction" method="get" target="_blank">
+            <input id="search-text" class="" :placeholder="currentPlaceholder" style="outline:0" type="text">
+            <button @click="search"><i class="iconfont icon-search"></i></button>
+          </form>
+        </div>
+      </div>
+      <div class="subcategories">
+        <!-- 小类按钮 -->
+        <button v-for="(subcategory, index) in subcategories[currentCategoryIndex]" :key="index"
+                class="c-button" @click="changeSubcategory(index)">{{ subcategory.name }}
+        </button>
       </div>
     </div>
-    </div>
+  </div>
 
 </template>
 <script setup>
 import vMiniWeather from '@/views/components/vMiniWeather.vue'
 import vMiniWeatherIcon from '@/views/components/vMiniWeatherIcon/vMiniWeatherIcon.vue'
-import {computed, defineProps, h, ref} from 'vue'
+import {computed, defineProps, h, onMounted, ref} from 'vue'
 import axios from "axios";
 import {NAvatar, NDropdown, NIcon, NText, useMessage} from "naive-ui";
 import {
@@ -76,10 +72,13 @@ import {
   PersonCircleOutline as UserIcon,
   SettingsOutline as AdminIcon
 } from "@vicons/ionicons5";
+
 const message = useMessage();
 const props = defineProps({
-  collapsed: { type: Boolean, required: true }
+  collapsed: {type: Boolean, required: true}
 })
+
+
 const emit = defineEmits(['update:collapsed']);
 const renderIcon = (icon) => {
   return () => {
@@ -88,11 +87,205 @@ const renderIcon = (icon) => {
     });
   };
 };
+const categories = ['搜索', '工具', '社区', '生活', '影视'];
+const subcategories = [
+  [
+    {
+      "name": "必应",
+      "url": "https://www.bing.com/search?q=",
+      "placeholder": "必应"
+    },
+    {
+      "name": "谷歌",
+      "url": "https://www.google.com/search?q=",
+      "placeholder": "谷歌两下"
+    },
+    {
+      "name": "360",
+      "url": "https://www.so.com/s?q=",
+      "placeholder": "360好搜"
+    },
+    {
+      "name": "搜狗",
+      "url": "https://www.sogou.com/web?query=",
+      "placeholder": "搜狗搜索"
+    },
+    {
+      "name": "磁力",
+      "url": "https://p9.btapp.me/so.php?word=",
+      "placeholder": "磁力搜索"
+    },
+    {
+      "name": "神马",
+      "url": "https://yz.m.sm.cn/s?q=",
+      "placeholder": "神马搜索"
+    }
+  ],
+  [
+    {
+      "name": "权重查询",
+      "url": "https://rank.chinaz.com/all/",
+      "placeholder": "请输入网址(不带https://)"
+    },
+    {
+      "name": "友链检测",
+      "url": "https://link.chinaz.com/",
+      "placeholder": "请输入网址(不带https://)"
+    },
+    {
+      "name": "备案查询",
+      "url": "https://icp.chinaz.com/",
+      "placeholder": "请输入网址(不带https://)"
+    },
+    {
+      "name": "PING检测",
+      "url": "https://ping.chinaz.com/",
+      "placeholder": "请输入网址(不带https://)"
+    },
+    {
+      "name": "死链检测",
+      "url": "https://tool.chinaz.com/Links/?DAddress=",
+      "placeholder": "请输入网址(不带https://)"
+    },
+    {
+      "name": "关键词挖掘",
+      "url": "https://www.ciku5.com/s?wd=",
+      "placeholder": "请输入关键词"
+    }
+  ],
+  [
+    {
+      "name": "知乎",
+      "url": "https://www.zhihu.com/search?type=content&q=",
+      "placeholder": "知乎"
+    },
+    {
+      "name": "微信",
+      "url": "https://weixin.sogou.com/weixin?type=2&query=",
+      "placeholder": "微信"
+    },
+    {
+      "name": "微博",
+      "url": "https://s.weibo.com/weibo/",
+      "placeholder": "微博"
+    },
+    {
+      "name": "豆瓣",
+      "url": "https://www.douban.com/search?q=",
+      "placeholder": "豆瓣"
+    },
+    {
+      "name": "搜外问答",
+      "url": "https://ask.seowhy.com/search/?q=",
+      "placeholder": "SEO问答社区"
+    }
+  ],
+
+  [
+    {
+      "name": "淘宝",
+      "url": "https://s.taobao.com/search?q=",
+      "placeholder": "淘宝"
+    },
+    {
+      "name": "京东",
+      "url": "https://search.jd.com/Search?keyword=",
+      "placeholder": "京东"
+    },
+    {
+      "name": "下厨房",
+      "url": "https://www.xiachufang.com/search/?keyword=",
+      "placeholder": "下厨房"
+    },
+    {
+      "name": "香哈菜谱",
+      "url": "https://www.xiangha.com/so/?q=caipu&s=",
+      "placeholder": "香哈菜谱"
+    },
+    {
+      "name": "12306",
+      "url": "https://www.12306.cn/?",
+      "placeholder": "12306"
+    },
+    {
+      "name": "快递100",
+      "url": "https://www.kuaidi100.com/?",
+      "placeholder": "快递100"
+    },
+    {
+      "name": "去哪儿",
+      "url": "https://www.qunar.com/?",
+      "placeholder": "去哪儿"
+    }
+  ],
+  [
+    {
+      "name": "油1",
+      "url": "https://piped.hostux.net/results?search_query=",
+      "placeholder": "油1"
+    },
+    {
+      "name": "油2",
+      "url": "https://watch.leptons.xyz/results?search_query=",
+      "placeholder": "油2"
+    },
+    {
+      "name": "油3",
+      "url": "https://cf.piped.video/results?search_query=",
+      "placeholder": "油3"
+    },
+    {
+      "name": "油4",
+      "url": "https://piped.video/results?search_query=",
+      "placeholder": "油4"
+    }
+  ]
+
+];
+const currentCategoryIndex = ref(0);
+const currentSubcategoryIndex = ref(0);
+
+const currentAction = ref()
+
+function changeCategory(index) {
+  currentCategoryIndex.value = index;
+  currentSubcategoryIndex.value = 0; // 切换大类时，默认选中第一个小类
+  currentAction.value = subcategories[index][0].url
+}
+
+onMounted(() => {
+  currentAction.value = subcategories[0][0].url
+  const buttons = document.querySelectorAll('.c-button');
+  buttons.forEach((button, i) => {
+    if (i === 0) {
+      button.classList.add('active');
+    } else {
+      button.classList.remove('active');
+    }
+  });
+});
+
+function changeSubcategory(index) {
+  currentSubcategoryIndex.value = index;
+  currentAction.value = subcategories[currentCategoryIndex.value][index].url
+  // 使元素为选中状态
+  const buttons = document.querySelectorAll('.c-button');
+  buttons.forEach((button, i) => {
+    if (i === index) {
+      button.classList.add('active');
+    } else {
+      button.classList.remove('active');
+    }
+  });
+}
+const currentPlaceholder = computed(() => {
+  return subcategories[currentCategoryIndex.value][currentSubcategoryIndex.value].placeholder;
+});
 const openMenu = () => {
   emit('update:collapsed', !props.collapsed);
 }
-const systemInfo =ref(null)
-const userInfo=ref(null)
+const systemInfo = ref(null)
+const userInfo = ref(null)
 const Logout = async () => {
   try {
     await axios.post('/api/logout');
@@ -113,23 +306,20 @@ const renderCustomHeader = () => {
       [
         h(NAvatar, {
           round: true,
-          style: { 'margin-right': '12px', 'display': 'flex' },
-        },() => [h(NText, { depth: 1 }, { default: () => userInfo.value.username })]),
+          style: {'margin-right': '12px', 'display': 'flex'},
+        }, () => [h(NText, {depth: 1}, {default: () => userInfo.value.username})]),
         h("div", null, [
-          h("div", null, [h(NText, { depth: 2 }, { default: () => userInfo.value.nickname })]),
-          h("div", { style: "font-size: 12px;" }, [
+          h("div", null, [h(NText, {depth: 2}, {default: () => userInfo.value.nickname})]),
+          h("div", {style: "font-size: 12px;"}, [
             h(
                 NText,
-                { depth: 3 },
-                { default: () => "欢迎访问Yserver服务平台" }
+                {depth: 3},
+                {default: () => "欢迎访问Yserver服务平台"}
             )
           ])
         ])
       ]
-
   );
-  //加入分割线
-
 }
 
 const menuOptions = computed(() => {
@@ -161,71 +351,20 @@ const menuOptions = computed(() => {
     },
   ];
 });
-const handleSelect =(key)=>{
-  if (key==='logout'){
+const handleSelect = (key) => {
+  if (key === 'logout') {
     Logout()
+  } else {
+    location.href = systemInfo.value.base_url + '/' + key
   }
-  else {
-    location.href = systemInfo.value.base_url+'/'+key
-  }
-
-
 }
-const searchBar = ref([
-  {
-    type: '常用',
-    list: [
-      {
-        name: '必应',
-        url: 'https://www.bing.com/search?q='
-      },
-      {
-        name: '谷歌',
-        url: 'https://www.google.com/search?q='
-      },
-      {
-        name: '淘宝',
-        url: 'https://s.taobao.com/search?q='
-      }
-    ]
-  },
-  {
-    type: '搜索引擎',
-    list: [
-      {
-        name: '必应',
-        url: 'https://www.bing.com/search?q='
-      },
-      {
-        name: '谷歌',
-        url: 'https://www.google.com/search?q='
-      },
-      {
-        name: '百度',
-        url: 'https://www.baidu.com/s?wd='
-      },
-      {
-        name: '搜狗',
-        url: 'https://www.sogou.com/web?query='
-      },
-      {
-        name: '360',
-        url: 'https://www.so.com/s?q='
-      },
-      {
-        name: '神马搜索',
-        url: 'https://yz.m.sm.cn/s?q='
-      }
-    ]
-  }
-])
 //bing搜索
 const search = (e) => {
   e.preventDefault();
   const searchText = document.getElementById('search-text').value
-  window.open(`https://www.bing.com/search?q=${searchText}`)
+  window.open(currentAction.value+searchText)
 }
-const getUserInfo =async () => {
+const getUserInfo = async () => {
   axios.get('/api/user/me', {withCredentials: true}).then(response => {
     userInfo.value = response.data.result
   }).catch(error => {
@@ -240,24 +379,7 @@ const getUserInfo =async () => {
 getUserInfo()
 </script>
 <style>
-.labels {
-  padding: 10px 20px;
-  font-size: 16px;
-  color: rgba(204,203,208,0.97);
-}
-.labels:hover {
-  color: #fff;
-}
-label {
-  display: block;
-  font-size: 15px;
-  text-align: center;
-  font-weight: normal;
-  margin-bottom: 0;
-  padding: 2px 0;
-  cursor: pointer;
-  transition: .3s;
-}
+
 @keyframes diagonal-scroll {
   0%, 100% {
     background-position: 0% 0%;
@@ -274,5 +396,55 @@ label {
 }
 
 
+.categories, .subcategories {
+  text-align: center;
+}
+
+.active:before {
+  content: '';
+  border-width: 8px 8px 8px 8px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.6) transparent transparent;
+  position: relative;
+  left: 50%;
+  top: 0;
+  margin-left: -8px;
+}
+
+.c-button {
+  padding: 6px 10px 0px 10px;
+  background-color: rgba(204, 203, 208, 0);
+  border: none;
+  color: #d0ccc0;
+}
+
+.c-button:hover {
+  color: white;
+}
+
+/* 选中状态 */
+.c-button.active {
+  color: white;
+}
+
+.m-button {
+  padding: 0 20px;
+  background-color: rgba(204, 203, 208, 0);
+  border: none;
+  color: #d0ccc0;
+  font-size: 16px;
+  text-align: center;
+  font-weight: normal;
+
+  transition: .3s;
+  position: relative;
+
+}
+.m-button:hover {
+  color: white;
+}
+.m-button.active {
+  color: white;
+}
 
 </style>
