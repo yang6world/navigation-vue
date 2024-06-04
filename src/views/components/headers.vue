@@ -36,13 +36,15 @@
     </div>
     <div class="s-search">
       <div class="categories">
-        <!-- 大类按钮 -->
+        <div>
         <button v-for="(category, index) in categories" class="m-button" :key="index" @click="changeCategory(index)">{{
             category
           }}
         </button>
+        </div>
+        <div class="anchor" style="position: absolute; left: 367.5px; opacity: 1; width: 35px;"></div>
       </div>
-      <div id="search" class="s-search mx-auto mt-30px">
+      <div id="search" class="s-search mx-auto mt-3">
         <div class="search-box">
           <form :action="currentAction" method="get" target="_blank">
             <input id="search-text" class="" :placeholder="currentPlaceholder" style="outline:0" type="text">
@@ -251,19 +253,17 @@ function changeCategory(index) {
   currentCategoryIndex.value = index;
   currentSubcategoryIndex.value = 0; // 切换大类时，默认选中第一个小类
   currentAction.value = subcategories[index][0].url
-}
-
-onMounted(() => {
-  currentAction.value = subcategories[0][0].url
-  const buttons = document.querySelectorAll('.c-button');
+  const buttons = document.querySelectorAll('.m-button');
   buttons.forEach((button, i) => {
-    if (i === 0) {
-      button.classList.add('active');
+    if (i === index) {
+      button.classList.add('m-active');
     } else {
-      button.classList.remove('active');
+      button.classList.remove('m-active');
     }
   });
-});
+}
+
+
 
 function changeSubcategory(index) {
   currentSubcategoryIndex.value = index;
@@ -361,8 +361,9 @@ const handleSelect = (key) => {
 //bing搜索
 const search = (e) => {
   e.preventDefault();
-  const searchText = document.getElementById('search-text').value
-  window.open(currentAction.value+searchText)
+  const searchText = document.getElementById('search-text')
+  window.open(currentAction.value+searchText.value)
+  searchText.value = ''
 }
 const getUserInfo = async () => {
   axios.get('/api/user/me', {withCredentials: true}).then(response => {
@@ -376,6 +377,25 @@ const getUserInfo = async () => {
   } catch (error) {
   }
 }
+onMounted(() => {
+  currentAction.value = subcategories[0][0].url
+  const c_buttons = document.querySelectorAll('.c-button');
+  c_buttons.forEach((button, i) => {
+    if (i === 0) {
+      button.classList.add('active');
+    } else {
+      button.classList.remove('active');
+    }
+  });
+  const m_buttons = document.querySelectorAll('.m-button');
+  m_buttons.forEach((button, i) => {
+    if (i === 0) {
+      button.classList.add('m-active');
+    } else {
+      button.classList.remove('m-active');
+    }
+  });
+});
 getUserInfo()
 </script>
 <style>
@@ -426,6 +446,16 @@ getUserInfo()
 .c-button.active {
   color: white;
 }
+.m-button:hover:after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  background-color: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 110%;
+  left: 50%;
+}
 
 .m-button {
   padding: 0 20px;
@@ -435,16 +465,29 @@ getUserInfo()
   font-size: 16px;
   text-align: center;
   font-weight: normal;
-
   transition: .3s;
   position: relative;
 
 }
 .m-button:hover {
   color: white;
+
 }
-.m-button.active {
+.m-button.m-active {
   color: white;
+}
+
+.m-active:before{
+  content: '';
+  background:#fff;
+  border-radius:100px;
+  width:35px;
+  height:5px;
+  bottom:5px;
+  -webkit-transition:.25s;
+  transition:.25s;
+  position: absolute;
+  top: 110%;
 }
 
 </style>
