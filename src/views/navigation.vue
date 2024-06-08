@@ -6,7 +6,7 @@ import yserver from "@/views/components/icon/yserver.vue"
 import yserverLong from "@/views/components/icon/yserverLong.vue"
 import axios from "axios";
 const message = useMessage();
-
+const recentWebsites = ref();
 
 const loading = ref(true)
 setTimeout(function () {
@@ -27,13 +27,25 @@ const handleCollapsedUpdate = (newCollapsed) => {
   collapsed.value = newCollapsed;
 }
 const menuOptions = computed(() => {
-  return websites.value.map((website) => {
+  const recentOptions =[{
+      label: '常用推荐',
+      icon: () => h('i', { class: "icon-ithome iconfont", style: 'font-size: 20px; color: #474b48' }),
+      key: `常用推荐`,
+    }];
+
+
+  const websiteOptions = websites.value.map((website) => {
     return {
       label: website.title,
-      icon: () => h('i', { class: website.icon, style: 'font-size: 20px' }),
+      icon: () => h('i', { class: website.icon, style: 'font-size: 20px; color: #474b48' }),
       key: website.title,
-    }
+    };
   });
+  if (recentWebsites.value.length > 0) {
+    return [...recentOptions, ...websiteOptions];
+  }
+  return websiteOptions;
+
 });
 const sectionRefs = ref({});
 const topRef = ref(null);
@@ -59,9 +71,29 @@ const isMobile = ref(window.innerWidth < 768);  // 假设移动端断点为 768p
 function updateMobileStatus() {
   isMobile.value = window.innerWidth < 768;
 }
+const updateRecentWebsites = (website) => {
+  let recent = JSON.parse(localStorage.getItem('recentWebsites') || '[]');
+  recent = recent.filter(item => item.name !== website.name);
+  recent.unshift(website);
+  if (recent.length > 5) {
+    recent.pop();
+  }
+  localStorage.setItem('recentWebsites', JSON.stringify(recent));
+  recentWebsites.value = recent;
+};
 
+const handleLinkClick = (item) => {
+  const clickedWebsite = {
+    name: item.name,
+    url: item.url,
+    icon: item.icon,
+    description: item.description,
+  };
+  updateRecentWebsites(clickedWebsite);
+};
 onMounted(() => {
   window.addEventListener('resize', updateMobileStatus);
+  recentWebsites.value = JSON.parse(localStorage.getItem('recentWebsites') || '[]');
 });
 
 onUnmounted(() => {
@@ -106,6 +138,49 @@ getWebsite()
           <div ref="topRef">
             <headers style="height: 230px" v-model:collapsed="collapsed" @update:collapsed="handleCollapsedUpdate"/>
             <div class="ml-6 mr-6 ">
+              <div v-if="recentWebsites.length > 0" :ref="setRef('常用推荐')">
+                <div class="d-flex flex-fill ">
+                  <h4 class="text-gray text-lg mb-4">
+                    <i id="term-2" class="site-tag iconfont icon-tag icon-lg mr-1" style="font-size: 25px"></i>
+                    常用推荐
+                  </h4>
+                  <div class="flex-fill"></div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+                  <div v-for="item in recentWebsites" :key="item.name"
+                       class="card transform transition-transform hover:scale-105 hover:shadow-2xl description">
+                    <n-tooltip placement="bottom" trigger="hover">
+                      <template #trigger>
+                        <div class="p-4 bg-white rounded-lg shadow flex description">
+                          <a :href="item.url" class="block hover:text-red description" rel="noopener noreferrer"
+                             target="_blank" @click="handleLinkClick(item)">
+                            <div class="flex items-center space-x-2">
+                              <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center">
+                                <img :src="item.icon" alt="icon" class="w-full h-full" style="border-radius: 50px">
+                              </div>
+                              <div class="flex-grow description">
+                                <div class="text-sm font-bold truncate">
+                                  {{ item.name }}
+                                </div>
+                                <p class="m-0 text-xs text-gray-600 truncate description">{{ item.description }}</p>
+                              </div>
+                            </div>
+                          </a>
+                          <a :href="item.url" class="togo block text-center text-gray-600 hover:text-gray-800"
+                             rel="nofollow" title="直达" @click="handleLinkClick(item)">
+                            <i class="iconfont icon-goto"></i>
+                          </a>
+                        </div>
+                      </template>
+                      <span>{{ item.description }}</span>
+                    </n-tooltip>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <div class="ml-6 mr-6 ">
               <div v-for="website in websites" :key="website.title" :ref="setRef(website.title)">
                 <div class="d-flex flex-fill ">
                   <h4 class="text-gray text-lg mb-4">
@@ -122,7 +197,7 @@ getWebsite()
                       <template #trigger>
                         <div class="p-4 bg-white rounded-lg shadow flex description">
                           <a :href="item.url" class="block hover:text-red description" rel="noopener noreferrer"
-                             target="_blank">
+                             target="_blank" @click="handleLinkClick(item)">
                             <div class="flex items-center space-x-2">
                               <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center">
                                 <img :src="item.icon" alt="icon" class="w-full h-full" style="border-radius: 50px">
@@ -136,7 +211,7 @@ getWebsite()
                             </div>
                           </a>
                           <a :href="item.url" class="togo block text-center text-gray-600 hover:text-gray-800"
-                             rel="nofollow" title="直达">
+                             rel="nofollow" title="直达" @click="handleLinkClick(item)">
                             <i class="iconfont icon-goto"></i>
                           </a>
                         </div>
