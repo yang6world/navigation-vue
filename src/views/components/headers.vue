@@ -47,10 +47,16 @@
       <div id="search" class="s-search mx-auto mt-3">
         <div class="search-box">
           <form :action="currentAction" method="get" target="_blank">
-            <input id="search-text" class="" :placeholder="currentPlaceholder" style="outline:0" type="text">
+            <input id="search-text" v-model="searchText" ref="searchTextInput" class="" :placeholder="currentPlaceholder" style="outline:0" type="text">
             <button @click="search"><i class="iconfont icon-search"></i></button>
           </form>
         </div>
+        <div class="suggest-card search-smart-tips" id="search-suggest" ref="searchSuggestBox" style="display: none">
+          <ul>
+            <li  @mousedown.prevent v-for="item in searchSuggest" @click="selectSuggest(item.Txt)">{{item.Txt}}</li>
+          </ul>
+        </div>
+
       </div>
       <div class="subcategories" style="display: block">
         <!-- 小类按钮 -->
@@ -58,6 +64,7 @@
                 class="c-button" @click="changeSubcategory(index)">{{ subcategory.name }}
         </button>
       </div>
+
     </div>
   </div>
 
@@ -65,7 +72,7 @@
 <script setup>
 import vMiniWeather from '@/views/components/vMiniWeather.vue'
 import vMiniWeatherIcon from '@/views/components/vMiniWeatherIcon/vMiniWeatherIcon.vue'
-import {computed, defineProps, h, onMounted, ref} from 'vue'
+import {computed, defineProps, h, onMounted, ref, watch} from 'vue'
 import axios from "axios";
 import {NAvatar, NDropdown, NIcon, NText, useMessage} from "naive-ui";
 import {
@@ -79,7 +86,10 @@ const message = useMessage();
 const props = defineProps({
   collapsed: {type: Boolean, required: true}
 })
-
+const searchText = ref('')
+const searchSuggest = ref([])
+const searchTextInput = ref(null);
+const searchSuggestBox = ref(null);
 
 const emit = defineEmits(['update:collapsed']);
 const renderIcon = (icon) => {
@@ -358,12 +368,49 @@ const handleSelect = (key) => {
     location.href = systemInfo.value.base_url + '/' + key
   }
 }
-//bing搜索
+
 const search = (e) => {
   e.preventDefault();
-  const searchText = document.getElementById('search-text')
   window.open(currentAction.value+searchText.value)
   searchText.value = ''
+}
+
+
+watch(searchText, (val) => {
+  // 移除之前的 JSONP 回调函数
+  if (window.bing && window.bing.sug) {
+    delete window.bing.sug;
+  }
+
+  // 创建 JSONP 回调函数
+  window.bing = {
+    sug: (data) => {
+      searchSuggest.value = data.AS.Results.flatMap(result => result.Suggests);
+      console.log(searchSuggest.value);
+    }
+  };
+
+  // 创建 script 标签
+  const script = document.createElement('script');
+  script.src = `https://api.bing.com/qsonhs.aspx?type=cb&q=${searchText.value}&cb=window.bing.sug`;
+
+  // 添加错误处理
+  script.onerror = () => {
+    console.error('获取搜索建议失败');
+  };
+
+  // 将 script 标签添加到 DOM 中
+  document.body.appendChild(script);
+
+  // 清理旧的 script 标签
+  script.onload = () => {
+    document.body.removeChild(script);
+  };
+
+});
+const selectSuggest = (text) => {
+  console.log(text);
+  searchText.value = text;
 }
 const getUserInfo = async () => {
   axios.get('/api/user/me', {withCredentials: true}).then(response => {
@@ -395,6 +442,14 @@ onMounted(() => {
       button.classList.remove('m-active');
     }
   });
+  //如果鼠标焦点在搜索框内，显示搜索建议
+  searchTextInput.value.addEventListener('focus', () => {
+    searchSuggestBox.value.style.display = 'block';
+  });
+//如果鼠标焦点不在搜索框内，隐藏搜索建议
+  searchTextInput.value.addEventListener('blur', () => {
+    searchSuggestBox.value.style.display = 'none';
+  });
 });
 getUserInfo()
 </script>
@@ -408,13 +463,73 @@ getUserInfo()
     background-position: 100% 100%;
   }
 }
-
+.search-smart-tips {
+  width: unset;
+  left: 20px;
+  right: 20px;
+  position: absolute;
+  z-index: 20;
+  overflow: hidden;
+}
+.suggest-card {
+  top:80px;
+  background: #fff;
+  border-width: 0;
+  margin-bottom: 1rem;
+  box-shadow: 0px 0px 20px -5px rgba(158,158,158,.2);
+  transition: background-color .3s;
+}
+.suggest-card {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid rgba(0,0,0,.125);
+  border-radius: .25rem;
+}
 .diagonal-gradient {
   background: linear-gradient(135deg, #6a0dad, #bc34d3, #3a0ca3);
   background-size: 300% 300%;;
   animation: diagonal-scroll 6s ease-in-out infinite;
 }
+.search-smart-tips ul li {
+  line-height: 30px;
+  font-size: 14px;
+  padding: 0px 20px;
+  cursor: pointer;
+  list-style: none;
+  transition: .3s;
+  animation: showIn 1s;
+}
+@keyframes showIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/*添加进入退出动画*/
 
+.search-smart-tips ul li:hover, .search-smart-tips ul li.current {
+  background-color: rgba(130,130,130,.5);
+}
+li {
+  display: list-item;
+  text-align: -webkit-match-parent;
+  unicode-bidi: isolate;
+}
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 
 .categories, .subcategories {
   text-align: center;
