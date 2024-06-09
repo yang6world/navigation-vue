@@ -5,6 +5,7 @@ import headers from "@/views/components/headers.vue";
 import yserver from "@/views/components/icon/yserver.vue"
 import yserverLong from "@/views/components/icon/yserverLong.vue"
 import axios from "axios";
+import SearchBox from "@/views/components/searchBox.vue";
 const message = useMessage();
 const recentWebsites = ref();
 
@@ -75,7 +76,7 @@ const updateRecentWebsites = (website) => {
   let recent = JSON.parse(localStorage.getItem('recentWebsites') || '[]');
   recent = recent.filter(item => item.name !== website.name);
   recent.unshift(website);
-  if (recent.length > 5) {
+  if (recent.length > 6) {
     recent.pop();
   }
   localStorage.setItem('recentWebsites', JSON.stringify(recent));
@@ -134,9 +135,12 @@ getWebsite()
               @update:value="onMenuSelect"
           />
         </n-layout-sider>
-        <n-layout class="overflow-auto bg-slate-100">
+        <n-layout class="bg-slate-100">
           <div ref="topRef">
-            <headers style="height: 230px" v-model:collapsed="collapsed" @update:collapsed="handleCollapsedUpdate"/>
+            <div class="diagonal-gradient" style="height: 237px;">
+              <headers v-model:collapsed="collapsed" @update:collapsed="handleCollapsedUpdate"/>
+              <search-box style="margin: 30px auto" />
+            </div>
             <div class="ml-6 mr-6 ">
               <div v-if="recentWebsites.length > 0" :ref="setRef('常用推荐')">
                 <div class="d-flex flex-fill ">
@@ -243,6 +247,14 @@ getWebsite()
 </template>
 
 <style scoped>
+@keyframes diagonal-scroll {
+  0%, 100% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+}
 .n-layout {
   height: 100vh;
 
@@ -333,5 +345,10 @@ a {
     height: 30px;
     width: 15px
   }
+}
+.diagonal-gradient {
+  background: linear-gradient(135deg, #6a0dad, #bc34d3, #3a0ca3);
+  background-size: 300% 300%;;
+  animation: diagonal-scroll 6s ease-in-out infinite;
 }
 </style>
