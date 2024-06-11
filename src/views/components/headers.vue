@@ -34,8 +34,8 @@
     </div>
 </template>
 <script setup>
-import vMiniWeather from '@/views/components/vMiniWeather.vue'
-import vMiniWeatherIcon from '@/views/components/vMiniWeatherIcon/vMiniWeatherIcon.vue'
+import VMiniWeather from '@/views/components/vMiniWeather.vue'
+import VMiniWeatherIcon from "@/views/components/vMiniWeatherIcon/vMiniWeatherIcon.vue";
 import {computed, defineProps, h, ref} from 'vue'
 import axios from "axios";
 import {NAvatar, NDropdown, NIcon, NText, useMessage} from "naive-ui";
@@ -45,6 +45,7 @@ import {
   PersonCircleOutline as UserIcon,
   SettingsOutline as AdminIcon
 } from "@vicons/ionicons5";
+
 
 const message = useMessage();
 const props = defineProps({
